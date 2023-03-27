@@ -1,0 +1,18 @@
+{
+  "name": "gcCalendar",
+  "lowCaseName": "gccalendar",
+  "description": "A simple calendar plugin for MODX Revolution",
+  "version": "1.0.0-pl",
+  "author": "matdave",
+  "package": {},
+  "database": {
+    "tables": [
+      "GcCalendarCals",
+      "GcCalendarCats",
+      "GcCalendarDates",
+      "GcCalendarEvents",
+      "GcCalendarCatsConnect",
+      "GcCalendarCalsConnect"
+    ]
+  }
+}
