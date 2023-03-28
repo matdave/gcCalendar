@@ -32,15 +32,13 @@ class GcCalendarGetListProcessor extends modObjectGetListProcessor
         $query = $this->getProperty('searchbox');
         $combo = $this->getProperty('combobox');
         $history = $this->getProperty('historical');
-        //$qu = array();
         if (!empty($query)) {
             $qu = array(
                 'title:LIKE' => '%'.preg_replace('/[^a-rtzA-Z0-9]/', '%', $query).'%'
             );
-        }
 
-        $andState = (!empty($query))?'AND:':'';
-        $tp = array();
+            $c->where($qu);
+        }
         if (!empty($combo)) {
             $calfilt = $this->modx->newQuery('GcCalendarCalsConnect');
             $calfilt->where(array('calid:='=>$combo));
@@ -51,17 +49,17 @@ class GcCalendarGetListProcessor extends modObjectGetListProcessor
             }
 
             $tp = array(
-                $andState.'id:IN' => $cids
+                'id:IN' => $cids
             );
-        }
 
-        $andState = (!empty($query)||!empty($combo))?'AND:':'';
+            $c->where($tp);
+        }
         $stime = strtotime('-1 day');
         $tim = ($history == 1) ?
-            array($andState.'start:<=' => $stime,'AND:end:<=' => $stime,'or:repeatenddate:<=' => $stime ) :
-            array($andState.'start:>=' => $stime,'OR:end:>=' => $stime,'OR:repeatenddate:>=' => $stime );
+            array('start:<=' => $stime,'AND:end:<=' => $stime,'or:repeatenddate:<=' => $stime ) :
+            array('start:>=' => $stime,'OR:end:>=' => $stime,'OR:repeatenddate:>=' => $stime );
 
-        $c->where(array($qu, $tp, $tim));
+        $c->where($tim);
         return $c;
     }
 }

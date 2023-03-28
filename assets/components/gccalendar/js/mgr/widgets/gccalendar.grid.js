@@ -44,6 +44,7 @@ gcCalendar.grid.gcCalendar = function (config) {
             'repeatenddate',
             'repeatdates',
             'ov',
+            'editedon',
         ],
         paging: true,
         remoteSort: true,
@@ -103,6 +104,12 @@ gcCalendar.grid.gcCalendar = function (config) {
             {
                 header: 'Repeats',
                 dataIndex: 'repeating',
+                sortable: false,
+                width: 60,
+            },
+            {
+                header: 'Edited On',
+                dataIndex: 'editedon',
                 sortable: false,
                 width: 60,
             },

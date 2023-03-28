@@ -83,6 +83,8 @@ class GcCalendarCreateProcessor extends modObjectCreateProcessor
             $this->setProperty('repeatfrequency', null);
             $this->setProperty('repeatenddate', null);
         }
+        $this->setProperty('createdby',($this->modx->user->get('id')));
+        $this->setProperty('editedon',(date('Y-m-d H:i:s')));
 
         return parent::beforeSet();
     }
@@ -121,8 +123,8 @@ class GcCalendarCreateProcessor extends modObjectCreateProcessor
         $timediff = ($end - $start);
         if (!empty($repeatDatesArr)) {
             foreach ($repeatDatesArr as $rd) {
-                if ($rd != 0) {
-                    $rend = ($rd + $timediff);
+                if ((int)$rd != 0) {
+                    $rend = ((int)$rd + $timediff);
                     $rArr = array('start'=>$rd,'end'=>$rend, 'rep'=>1,'evid'=> $thisid);
                     $rdConnect = $this->modx->newObject('GcCalendarDates');
                     $rdConnect->fromArray($rArr);

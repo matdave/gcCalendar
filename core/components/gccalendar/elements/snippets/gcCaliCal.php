@@ -11,19 +11,6 @@ $gcCal = $modx->getService(
     $scriptProperties
 );
 
-/* FUNCTIONS!!*/
-// requires 24-hour time (see RFC 5545 section 3.3.12 for info).
-function dateToCal($timestamp)
-{
-    return date('Ymd\THis', $timestamp);
-}
-
-// Escapes a string of characters
-function escapeString($string)
-{
-    return preg_replace('/([\,;])/', '\\\$1', $string);
-}
-
 /* Get ID*/
 $evid = (isset($_GET['id']) && is_numeric($_GET['id'])) ? $_GET['id'] : null;
 if ($evid != null) {
@@ -43,14 +30,14 @@ if ($evid != null) {
     $output .= 'CALSCALE:GREGORIA' . PHP_EOL;
     foreach ($dateArr as $dArr) {
         $output .= 'BEGIN:VEVENT' . PHP_EOL;
-        $output .= 'DTEND;TZID=America/Chicago:' . dateToCal($dArr->get('end')) . PHP_EOL;
+        $output .= 'DTEND;TZID=America/Chicago:' . $gcCal->dateToCal($dArr->get('end')) . PHP_EOL;
         $output .= 'UID:' . $dArr->get('id') . PHP_EOL;
-        $output .= 'DTSTAMP:' . dateToCal(time()) . PHP_EOL;
+        $output .= 'DTSTAMP:' . $gcCal->dateToCal(time()) . PHP_EOL;
         $output .= 'LOCATION:' . $event->get('locationname') . ' ' . $event->get('locationaddr') . ' ' . $event->get('locationcity') . ', ' . $event->get('locationstate') . ' ' . $event->get('locationzip') . PHP_EOL;
         $output .= 'DESCRIPTION:' . strip_tags($event->get('notes')) . PHP_EOL;
         $output .= 'URL;VALUE=URI:' . $event->get('link') . PHP_EOL;
         $output .= 'SUMMARY:' . $event->get('title') . PHP_EOL;
-        $output .= 'DTSTART;TZID=America/Chicago:' . dateToCal($dArr->get('start')) . PHP_EOL;
+        $output .= 'DTSTART;TZID=America/Chicago:' . $gcCal->dateToCal($dArr->get('start')) . PHP_EOL;
         $output .= 'END:VEVENT' . PHP_EOL;
     }
     $output .= 'END:VCALENDAR';

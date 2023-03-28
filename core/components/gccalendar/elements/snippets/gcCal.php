@@ -1,23 +1,4 @@
 <?php
-
-function getEventCalendarDateRange($activeMonthOnlyEvents = false)
-{
-    $startDate = $_REQUEST['dt'] ?: strftime('%Y-%m');
-    $mStartDate = strftime('%Y-%m', strtotime($startDate)) . '-01 00:00:01';
-    $startDOW = strftime('%u', strtotime($mStartDate));
-    $lastDayOfMonth = strftime('%Y-%m', strtotime($mStartDate)) . '-' . date('t', strtotime($mStartDate)) . ' 23:59:59';
-    $startMonthCalDate = $startDOW <= 6 ?
-        strtotime('- ' . $startDOW . ' day', strtotime($mStartDate)) :
-        strtotime($mStartDate);
-    $endMonthCalDate = strtotime('+ 6 weeks', $startMonthCalDate);
-    if ($activeMonthOnlyEvents) {
-        return array('start' => strtotime($mStartDate), 'end' => strtotime($lastDayOfMonth));
-    } else {
-        return array('start' => $startMonthCalDate, 'end' => $endMonthCalDate);
-    }
-}
-
-
 //**  STARTING DATA **//
 
 //Call the Service
@@ -99,7 +80,7 @@ if ($detail != null && $r != null) {
 
     $modalView = $modx->getOption('modalView', $scriptProperties, false);
     $activeMonthOnlyEvents = $modx->getOption('activeMonthOnlyEvents', $scriptProperties, 0);
-    $dr = getEventCalendarDateRange($activeMonthOnlyEvents);
+    $dr = $gcCal->getEventCalendarDateRange($activeMonthOnlyEvents);
     $elStartDate = $dr['start'];
     $elEndDate = $dr['end'];
 
@@ -111,14 +92,14 @@ if ($detail != null && $r != null) {
 
     $time_start = microtime(true);
 
-    $startDate = $_GET['dt'] ? $_GET['dt'] : strftime('%Y-%m-%d');
-    $mStartDate = strftime('%Y-%m', strtotime($startDate)) . '-01 00:00:01';
-    $mCurMonth = strftime('%m', strtotime($mStartDate));
-    $nextMonth = strftime('%Y-%m', strtotime('+1 month', strtotime($mStartDate)));
-    $prevMonth = strftime('%Y-%m', strtotime('-1 month', strtotime($mStartDate)));
-    $startDOW = strftime('%u', strtotime($mStartDate));
-    $lastDayOfMonth = strftime('%Y-%m', strtotime($mStartDate)) . '-' . date('t', strtotime($mStartDate)) . ' 23:59:59';
-    $endDOW = strftime('%u', strtotime($lastDayOfMonth));
+    $startDate = $_GET['dt'] ? $_GET['dt'] : $gcCal->strFormatTime('%Y-%m-%d');
+    $mStartDate = $gcCal->strFormatTime('%Y-%m', strtotime($startDate)) . '-01 00:00:01';
+    $mCurMonth = $gcCal->strFormatTime('%m', strtotime($mStartDate));
+    $nextMonth = $gcCal->strFormatTime('%Y-%m', strtotime('+1 month', strtotime($mStartDate)));
+    $prevMonth = $gcCal->strFormatTime('%Y-%m', strtotime('-1 month', strtotime($mStartDate)));
+    $startDOW = $gcCal->strFormatTime('%u', strtotime($mStartDate));
+    $lastDayOfMonth = $gcCal->strFormatTime('%Y-%m', strtotime($mStartDate)) . '-' . date('t', strtotime($mStartDate)) . ' 23:59:59';
+    $endDOW = $gcCal->strFormatTime('%u', strtotime($lastDayOfMonth));
 
     $out = '';
     $startMonthCalDate = $startDOW <= 6 ?
@@ -127,13 +108,11 @@ if ($detail != null && $r != null) {
     $endMonthCalDate = strtotime('+ ' . (6 - $endDOW) . ' day', strtotime($lastDayOfMonth));
 
 
-    $calFilter = isset($_GET['calf']) ?
-        $_GET['calf'] :
-        $modx->getOption('calendarFilter', $scriptProperties, null); //-- Defaults to show all calendars
+    $calFilter = $_GET['calf'] ?? $modx->getOption('calendarFilter', $scriptProperties, null); //-- Defaults to show all calendars
 
     $headingLabel = strtotime($mStartDate);
     $globalParams = array('calf' => $calFilter);
-    $todayLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => strftime('%Y-%m'))));
+    $todayLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $gcCal->strFormatTime('%Y-%m'))));
     $listLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('list' => 1, 'fc' => 1)));
     $prevLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $prevMonth)));
     $nextLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $nextMonth)));
@@ -141,28 +120,6 @@ if ($detail != null && $r != null) {
     $days = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
     $dayNum = array(7, 1, 2, 3, 4, 5, 6);
     $heading = '';
-    function createDateRangeArray($strDateFrom, $strDateTo)
-    {
-        // takes two dates formatted as YYYY-MM-DD and creates an
-        // inclusive array of the dates between the from and to dates.
-
-        // could test validity of dates here but I'm already doing
-        // that in the main script
-
-        $aryRange = array();
-
-        $iDateFrom = mktime(1, 0, 0, substr($strDateFrom, 5, 2), substr($strDateFrom, 8, 2), substr($strDateFrom, 0, 4));
-        $iDateTo = mktime(1, 0, 0, substr($strDateTo, 5, 2), substr($strDateTo, 8, 2), substr($strDateTo, 0, 4));
-
-        if ($iDateTo >= $iDateFrom) {
-            array_push($aryRange, date('Y-m-d', $iDateFrom)); // first entry
-            while ($iDateFrom < $iDateTo) {
-                $iDateFrom += 86400; // add 24 hours
-                array_push($aryRange, date('Y-m-d', $iDateFrom));
-            }
-        }
-        return $aryRange;
-    }
 
     switch ($mode) {
         case 'calendar':
@@ -236,7 +193,9 @@ if ($detail != null && $r != null) {
                             $evitems[] = $eventDet;
                             $eo = ($eo == 0) ? 1 : 0;
                             $arrEventsDetail[$evid . '-' . $repid] = $eventDet;
-                            $arrEventDates[$evid . '-' . $repid] = array('date' => $eventDet['start'], 'end' => $eventDet['end'], 'ad' => $eventDet['ad'], 'eventId' => $evid, 'eventRepId' => $repid, 'repeatId' => 0);
+                            $arrEventDates[$evid . '-' . $repid] = array(
+                                'date' => $eventDet['start'],
+                                'end' => $eventDet['end'], 'ad' => $eventDet['ad'], 'eventId' => $evid, 'eventRepId' => $repid, 'repeatId' => 0);
                             $idx++;
                         }
                     } else {
@@ -251,8 +210,17 @@ if ($detail != null && $r != null) {
 
             if ($output == '') {
                 for ($i = 0; $i < 7; $i++) {
-                    $thisDOW = str_replace($dayNum, $days, strtolower(strftime('%u', strtotime('+ ' . $i . ' day', $startMonthCalDate))));
-                    $heading .= $modx->getChunk($headingTpl, array('dayOfWeekId' => '', 'dayOfWeekClass' => 'mxcdow', 'dayOfWeek' => $thisDOW));
+                    $thisDOW = str_replace(
+                        $dayNum,
+                        $days,
+                        strtolower(
+                            $gcCal->strFormatTime('%u', strtotime('+ ' . $i . ' day', $startMonthCalDate))
+                        )
+                    );
+                    $heading .= $modx->getChunk(
+                        $headingTpl,
+                        array('dayOfWeekId' => '', 'dayOfWeekClass' => 'mxcdow', 'dayOfWeek' => $thisDOW)
+                    );
                 }
                 //-- Set additional day placeholders for week
                 $phHeading = array(
@@ -264,18 +232,34 @@ if ($detail != null && $r != null) {
                 //-- Start the Date loop
                 $var = 0;
                 foreach ($arrEventDates as $e) {
-                    $oDetails = $arrEventsDetail[$e['eventId'] . '-' . $e['eventRepId']]; //Get original event (parent) details
+                    //Get original event (parent) details
+                    $oDetails = $arrEventsDetail[$e['eventId'] . '-' . $e['eventRepId']];
                     $oDetails['startdate'] = $e['date'];
                     $oDetails['enddate'] = $e['end'];
-                    if (((($oDetails['startdate'] >= $elStartDate || $oDetails['enddate'] >= $elStartDate) && $oDetails['enddate'] <= $elEndDate) || $displayType == 'detail' || $elDirectional)) {
+                    if (($oDetails['startdate'] >= $elStartDate || $oDetails['enddate'] >= $elStartDate) &&
+                        $oDetails['enddate'] <= $elEndDate
+                    ) {
                         $oDetails['startdate_fstamp'] = $oDetails['startdate'];
                         $oDetails['enddate_fstamp'] = $oDetails['enddate'];
 
-                        $oDetails['detailURL'] = $modx->makeUrl((!empty($ajaxResourceId) && (bool)$modalView === true ? $ajaxResourceId : $did), '', array('detail' => $e['eventId'], 'r' => $e['eventRepId']));
-                        if (strftime('%Y-%m-%d', $e['date']) == strftime('%Y-%m-%d', $e['end'])) {
-                            $events[strftime('%Y-%m-%d', $e['date'])][] = $oDetails;
+                        $oDetails['detailURL'] = $modx->makeUrl(
+                            (
+                                !empty($ajaxResourceId) && (bool)$modalView === true ?
+                                $ajaxResourceId :
+                                $did
+                            ),
+                            '',
+                            array('detail' => $e['eventId'], 'r' => $e['eventRepId'])
+                        );
+                        if ($gcCal->strFormatTime('%Y-%m-%d', $e['date']) ==
+                            $gcCal->strFormatTime('%Y-%m-%d', $e['end'])
+                        ) {
+                            $events[$gcCal->strFormatTime('%Y-%m-%d', $e['date'])][] = $oDetails;
                         } else {
-                            $spandates = createDateRangeArray(strftime('%Y-%m-%d', $e['date']), strftime('%Y-%m-%d', $e['end']));
+                            $spandates = $gcCal->createDateRangeArray(
+                                $gcCal->strFormatTime('%Y-%m-%d', $e['date']),
+                                $gcCal->strFormatTime('%Y-%m-%d', $e['end'])
+                            );
                             foreach ($spandates as $spD) {
                                 $events[$spD][] = $oDetails;
                             }
@@ -291,38 +275,53 @@ if ($detail != null && $r != null) {
                     do {
                         // Get the week's days
                         $iDay = strtotime('+ ' . $diw . ' day', $iWeek);
-                        $thisMonth = strftime('%m', $iDay);
+                        $thisMonth = $gcCal->strFormatTime('%m', $iDay);
 
                         $eventList = '';
-                        if (isset($events[strftime('%Y-%m-%d', $iDay)]) && count($events[strftime('%Y-%m-%d', $iDay)])) {
+                        if (isset($events[$gcCal->strFormatTime('%Y-%m-%d', $iDay)]) &&
+                            count($events[$gcCal->strFormatTime('%Y-%m-%d', $iDay)])
+                        ) {
                             //-- Echo each event item
-                            $e = $events[strftime('%Y-%m-%d', $iDay)];
+                            $e = $events[$gcCal->strFormatTime('%Y-%m-%d', $iDay)];
 
                             foreach ($e as $el) {
-                                $el['start'] = ($el['ad'] != 1) ? strftime('%l:%M %p', $el['start']) : 'All Day';
-                                $event_html = '<div id="' . $el['id'] . '" class="' . $el['eventClass'] . '">' . $el['start'] . '
-                                                            <span class="title startdate "><a aria-label="' . $el['detailURL'] . ' ' . $el['title'] . '" href="/' . $el['detailURL'] . '" class="gccalevent" >' . $el['title'] . '</a></span>
-                                                        </div>';
+                                $el['start'] = ($el['ad'] != 1) ?
+                                    $gcCal->strFormatTime('%l:%M %p', $el['start']) :
+                                    'All Day';
+                                $event_html = '<div id="' . $el['id'] .
+                                    '" class="' . $el['eventClass'] .
+                                    '">' . $el['start'] .
+                                    '<span class="title startdate "><a aria-label="' . $el['detailURL'] .
+                                    ' ' . $el['title'] .
+                                    '" href="/' . $el['detailURL'] .
+                                    '" class="gccalevent" >' . $el['title'] .
+                                    '</a></span></div>';
                                 $eventList .= $event_html;
                             }
                         }
 
                         //-- Set additional day placeholders for day
-                        $isToday = (strftime('%m-%d') == strftime('%m-%d', $iDay) /*&& $highlightToday==true */ ? 'today ' : '');
-                        $dayMonthName = strftime('%b', $iDay);
-                        $dayMonthDay = strftime('%d', $iDay);
-                        $dayMonthDay = (strftime('%d', $iDay) == 1 ? gcCal . phpstrftime('%b ', $iDay) . (substr($dayMonthDay, 0, 1) == '0' ? ' ' . substr($dayMonthDay, 1) : $dayMonthDay) : (substr($dayMonthDay, 0, 1) == '0' ? ' ' . substr($dayMonthDay, 1) : $dayMonthDay));
+                        $isToday = ($gcCal->strFormatTime('%m-%d') == $gcCal->strFormatTime('%m-%d', $iDay)) ?
+                            'today ' :
+                            '';
+                        $dayMonthName = $gcCal->strFormatTime('%b', $iDay);
+                        $dayMonthDay = $gcCal->strFormatTime('%d', $iDay);
+                        $dayMonthDay = ($gcCal->strFormatTime('%d', $iDay) == 1 ?
+                            $gcCal->strFormatTime('%b ', $iDay) . (substr($dayMonthDay, 0, 1) == '0' ?
+                                ' ' . substr($dayMonthDay, 1) :
+                                $dayMonthDay) :
+                            (substr($dayMonthDay, 0, 1) == '0' ?
+                                ' ' . substr($dayMonthDay, 1) :
+                                $dayMonthDay));
                         $phDay = array(
-                            //'dayOfMonth'=> str_replace('0', ' ', (strftime('%d',$iDay) == 1 ? strftime('%b %d',$iDay) : strftime('%d',$iDay)))
                             'dayOfMonth' => $dayMonthDay
-                        , 'dayOfMonthID' => 'dom-' . strftime('%b%A%d', $iDay)
-                        , 'events' => $eventList
-                        , 'fulldate' => strftime('%m/%d/%Y', $iDay)
-                        , 'tomorrow' => strftime('%m/%d/%Y', strtotime('+1 day', $iDay))
-                        , 'yesterday' => strftime('%m/%d/%Y', strtotime('-1 day', $iDay))
-                        , 'class' => $isToday/*.(array_key_exists(strftime('%Y-%m-%d', $iDay),$events) ? 'hasEvents' : 'noEvents')*/ . ($mCurMonth == $thisMonth ? '' : ' ncm')
+                            , 'dayOfMonthID' => 'dom-' . $gcCal->strFormatTime('%b%A%d', $iDay)
+                            , 'events' => $eventList
+                            , 'fulldate' => $gcCal->strFormatTime('%m/%d/%Y', $iDay)
+                            , 'tomorrow' => $gcCal->strFormatTime('%m/%d/%Y', strtotime('+1 day', $iDay))
+                            , 'yesterday' => $gcCal->strFormatTime('%m/%d/%Y', strtotime('-1 day', $iDay))
+                            , 'class' => $isToday . ($mCurMonth == $thisMonth ? '' : ' ncm')
                         );
-                        //$days.=$chunkDay->process($phDay);
                         $days .= $modx->getChunk($dayTpl, $phDay);
                     } while (++$diw < 7);
 
@@ -330,7 +329,7 @@ if ($detail != null && $r != null) {
                     //-- Set additional day placeholders for week
                     $phWeek = array(
                         'weekId' => 'mxcWeek' . $var
-                    , 'weekClass' => strftime('%A%d', $iDay)
+                    , 'weekClass' => $gcCal->strFormatTime('%A%d', $iDay)
                     , 'days' => $days
                     );
                     //$weeks.=$chunkWeek->process($phWeek);
@@ -344,15 +343,15 @@ if ($detail != null && $r != null) {
 
                 //-- Set additional day placeholders for month
                 $phMonth = array(
-                    'containerID' => strftime('%a', $iDay)
-                , 'containerClass' => strftime('%a%Y', $iDay)
-                , 'weeks' => $heading . $weeks
-                , 'headingLabel' => $headingLabel
-                , 'todayLink' => $todayLink
-                , 'todayLabel' => 'Today'
-                , 'listLink' => $listLink
-                , 'prevLink' => $prevLink
-                , 'nextLink' => $nextLink
+                    'containerID' => $gcCal->strFormatTime('%a', $iDay)
+                    , 'containerClass' => $gcCal->strFormatTime('%a%Y', $iDay)
+                    , 'weeks' => $heading . $weeks
+                    , 'headingLabel' => $headingLabel
+                    , 'todayLink' => $todayLink
+                    , 'todayLabel' => 'Today'
+                    , 'listLink' => $listLink
+                    , 'prevLink' => $prevLink
+                    , 'nextLink' => $nextLink
                 );
                 //return $chunkMonth->process($phMonth);
                 $output .= $modx->getChunk($monthTpl, $phMonth);

@@ -229,6 +229,9 @@ class GcCalendarUpdateProcessor extends modObjectUpdateProcessor
                 $this->setProperty('repeatenddate', $fI->get('end'));
             }
         }
+
+        $this->setProperty('editedby', ($this->modx->user->get('id')));
+        $this->setProperty('editedon', (date('Y-m-d H:i:s')));
         return parent::beforeSet();
     }
     public function getCals()

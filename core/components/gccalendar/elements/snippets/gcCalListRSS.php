@@ -15,7 +15,7 @@ $gcCal = $modx->getService(
 $output = '';
 
 $now = strtotime('Today 12:01:00AM');
-$lastev = strtotime('+1 Year');
+$lastev = strtotime('+1 week');
 
 //limit conext key
 $did =  $modx->resource->get('id');
@@ -144,6 +144,7 @@ if (!empty($calsArr)) {
                 $eventDet['title'] = $event->get('title');
                 $eventDet['locationname'] = $event->get('locationname');
                 $eventDet['locationaddr'] = $event->get('locationaddr');
+                $eventDet['pubDate'] = date("a, d b Y H:M:S z", strtotime("-1 week", $dArr->get('start')));
                 $eventDet['infoURL'] =  $modx->makeUrl(
                     (!empty($ajaxResourceId) ? $ajaxResourceId : $did),
                     '',

@@ -19,7 +19,7 @@ $c->select(array(
     'title'
 ));
 
-$c->sortby('title','ASC');
+$c->sortby('title', 'ASC');
 $categories = $modx->getCollection('GcCalendarCals', $c);
 
 /* iterate */
@@ -27,4 +27,4 @@ $clist = array();
 foreach ($categories as $gccc) {
     $clist[] = $gccc->toArray();
 }
-return $this->outputArray($clist,sizeof($clist));
+return $this->outputArray($clist, sizeof($clist));

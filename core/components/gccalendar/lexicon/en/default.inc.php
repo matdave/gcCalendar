@@ -1,7 +1,9 @@
 <?php
 $_lang['gccalendar'] = 'Cloud Calendar';
+$_lang['gccalendar.menu'] = 'Cloud Calendar';
 $_lang['gccalendar.s'] = 'Calendars';
 $_lang['gccalendar.desc'] = 'Manage the GearsCMS Cloud Calendar';
+$_lang['gccalendar.menu_desc'] = 'Manage the GearsCMS Cloud Calendar';
 $_lang['gccalendar.management'] = 'GearsCMS Cloud Calendar Administration';
 $_lang['gccalendar.management_desc'] = 'Update and manage your cloud calendar events';
 $_lang['gccalendar.editwin'] = 'Edit Event';
@@ -47,3 +49,6 @@ $_lang['gccalendar.label_dow_3'] = 'Wednesday';
 $_lang['gccalendar.label_dow_4'] = 'Thursday';
 $_lang['gccalendar.label_dow_5'] = 'Friday';
 $_lang['gccalendar.label_dow_6'] = 'Saturday';
+$_lang['gccalendar.created_by'] = 'Created By';
+$_lang['gccalendar.edited_by'] = 'Edited By';
+$_lang['gccalendar.edited_on'] = 'Edited On';
