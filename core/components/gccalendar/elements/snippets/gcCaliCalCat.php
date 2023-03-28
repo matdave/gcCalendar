@@ -5,8 +5,8 @@ $gcCal = $modx->getService(
     $modx->getOption(
         'gccalendar.core_path',
         null,
-        $modx->getOption('core_path') . 'components/gcCalendar/'
-    ) . 'model/gcCalendar/',
+        $modx->getOption('core_path') . 'components/gccalendar/'
+    ) . 'model/gccalendar/',
     $scriptProperties
 );
 $output = null;
@@ -32,7 +32,7 @@ if (!empty($cals)) {
     if (!empty($events) && !empty($dates)) {
         $output = 'BEGIN:VCALENDAR' . "\r\n";
         $output .= 'VERSION:2.0' . "\r\n";
-        $output .= 'PRODID:-//gcCalendar//IdeaBank Marketing//EN_US' . "\r\n";
+        $output .= 'PRODID:-//gccalendar//IdeaBank Marketing//EN_US' . "\r\n";
         $output .= 'METHOD:PUBLISH' . "\r\n";
         $output .= 'CALSCALE:GREGORIA' . "\r\n";
         foreach ($dates as $d) {

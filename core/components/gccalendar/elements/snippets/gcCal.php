@@ -5,12 +5,12 @@
 $corePath = $modx->getOption(
     'gccalendar.core_path',
     null,
-    $modx->getOption('core_path') . 'components/gcCalendar/'
+    $modx->getOption('core_path') . 'components/gccalendar/'
 );
 $gcCal = $modx->getService(
     'gccalendar',
     'GcCalendar',
-    $corePath . 'model/gcCalendar/',
+    $corePath . 'model/gccalendar/',
     $scriptProperties
 );
 $output = '';

@@ -6,8 +6,8 @@ $gcCal = $modx->getService(
     $modx->getOption(
         'gccalendar.core_path',
         null,
-        $modx->getOption('core_path') . 'components/gcCalendar/'
-    ) . 'model/gcCalendar/',
+        $modx->getOption('core_path') . 'components/gccalendar/'
+    ) . 'model/gccalendar/',
     $scriptProperties
 );
 

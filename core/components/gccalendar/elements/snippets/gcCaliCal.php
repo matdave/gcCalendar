@@ -6,8 +6,8 @@ $gcCal = $modx->getService(
     $modx->getOption(
         'gccalendar.core_path',
         null,
-        $modx->getOption('core_path') . 'components/gcCalendar/'
-    ) . 'model/gcCalendar/',
+        $modx->getOption('core_path') . 'components/gccalendar/'
+    ) . 'model/gccalendar/',
     $scriptProperties
 );
 
@@ -25,7 +25,7 @@ if ($evid != null) {
     header('Content-Disposition: attachment; filename=' . $event->get('title') . '.ics');
     $output = 'BEGIN:VCALENDAR' . PHP_EOL;
     $output .= 'VERSION:2.0' . PHP_EOL;
-    $output .= 'PRODID:-//gcCalendar//IdeaBank Marketing//EN_US' . PHP_EOL;
+    $output .= 'PRODID:-//gccalendar//IdeaBank Marketing//EN_US' . PHP_EOL;
     $output .= 'METHOD:PUBLISH' . PHP_EOL;
     $output .= 'CALSCALE:GREGORIA' . PHP_EOL;
     foreach ($dateArr as $dArr) {
