@@ -1,21 +1,29 @@
 <?php
+/**
+ * @package gccalendar
+ */
 $xpdo_meta_map['GcCalendarEvents']= array (
-  'package' => 'gcCalendar',
+  'package' => 'gccalendar',
   'version' => '1.1',
   'table' => 'gc_calendar_events',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'cid' => NULL,
     'start' => NULL,
     'end' => NULL,
+    'islive' => 1,
     'title' => NULL,
     'loc' => NULL,
     'notes' => NULL,
     'ad' => NULL,
-    'islive' => NULL,
     'cat' => NULL,
     'link' => NULL,
+    'ov' => 0,
     'previmage' => NULL,
     'locationcontact' => NULL,
     'locationphone' => NULL,
@@ -25,7 +33,6 @@ $xpdo_meta_map['GcCalendarEvents']= array (
     'locationcity' => NULL,
     'locationzip' => NULL,
     'locationstate' => NULL,
-    'ov' => 0,
     'repeating' => 0,
     'repeattype' => NULL,
     'repeaton' => NULL,
@@ -33,6 +40,9 @@ $xpdo_meta_map['GcCalendarEvents']= array (
     'repeatfrequency' => NULL,
     'repeatenddate' => NULL,
     'repeatdates' => NULL,
+    'createdby' => 0,
+    'editedby' => 0,
+    'editedon' => 'CURRENT_TIMESTAMP',
   ),
   'fieldMeta' => 
   array (
@@ -56,6 +66,13 @@ $xpdo_meta_map['GcCalendarEvents']= array (
       'precision' => '20',
       'phptype' => 'string',
       'null' => true,
+    ),
+    'islive' => 
+    array (
+      'dbtype' => 'boolean',
+      'phptype' => 'boolean',
+      'null' => false,
+      'default' => 1,
     ),
     'title' => 
     array (
@@ -83,12 +100,6 @@ $xpdo_meta_map['GcCalendarEvents']= array (
       'phptype' => 'boolean',
       'null' => false,
     ),
-    'islive' => 
-    array (
-      'dbtype' => 'boolean',
-      'phptype' => 'boolean',
-      'null' => false,
-    ),
     'cat' => 
     array (
       'dbtype' => 'varchar',
@@ -102,6 +113,13 @@ $xpdo_meta_map['GcCalendarEvents']= array (
       'precision' => '195',
       'phptype' => 'string',
       'null' => true,
+    ),
+    'ov' => 
+    array (
+      'dbtype' => 'boolean',
+      'phptype' => 'boolean',
+      'null' => false,
+      'default' => 0,
     ),
     'previmage' => 
     array (
@@ -165,14 +183,7 @@ $xpdo_meta_map['GcCalendarEvents']= array (
       'phptype' => 'string',
       'null' => true,
     ),
-    'ov' =>
-    array (
-      'dbtype' => 'boolean',
-      'phptype' => 'boolean',
-      'null' => false,
-      'default' => 0,
-    ),
-    'repeating' =>
+    'repeating' => 
     array (
       'dbtype' => 'boolean',
       'phptype' => 'boolean',
@@ -186,20 +197,20 @@ $xpdo_meta_map['GcCalendarEvents']= array (
       'phptype' => 'integer',
       'null' => true,
     ),
-      'repeaton' =>
-      array (
-        'dbtype' => 'varchar',
-        'precision' => '15',
-        'phptype' => 'string',
-        'null' => true,
-      ),
-      'repeatonmo' =>
-      array (
-        'dbtype' => 'varchar',
-        'precision' => '15',
-        'phptype' => 'string',
-        'null' => true,
-      ),
+    'repeaton' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '15',
+      'phptype' => 'string',
+      'null' => true,
+    ),
+    'repeatonmo' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '15',
+      'phptype' => 'string',
+      'null' => true,
+    ),
     'repeatfrequency' => 
     array (
       'dbtype' => 'int',
@@ -219,6 +230,31 @@ $xpdo_meta_map['GcCalendarEvents']= array (
       'dbtype' => 'text',
       'phptype' => 'string',
       'null' => true,
+    ),
+    'createdby' => 
+    array (
+      'dbtype' => 'int',
+      'precision' => '10',
+      'attributes' => 'unsigned',
+      'phptype' => 'integer',
+      'null' => true,
+      'default' => 0,
+    ),
+    'editedby' => 
+    array (
+      'dbtype' => 'int',
+      'precision' => '10',
+      'attributes' => 'unsigned',
+      'phptype' => 'integer',
+      'null' => true,
+      'default' => 0,
+    ),
+    'editedon' => 
+    array (
+      'dbtype' => 'TIMESTAMP',
+      'phptype' => 'string',
+      'null' => false,
+      'default' => 'CURRENT_TIMESTAMP',
     ),
   ),
   'indexes' => 
@@ -247,6 +283,25 @@ $xpdo_meta_map['GcCalendarEvents']= array (
       'foreign' => 'evid',
       'cardinality' => 'many',
       'owner' => 'local',
+    ),
+  ),
+  'aggregates' => 
+  array (
+    'CreatedBy' => 
+    array (
+      'class' => 'modUser',
+      'local' => 'createdby',
+      'foreign' => 'id',
+      'cardinality' => 'one',
+      'owner' => 'foreign',
+    ),
+    'EditedBy' => 
+    array (
+      'class' => 'modUser',
+      'local' => 'editedby',
+      'foreign' => 'id',
+      'cardinality' => 'one',
+      'owner' => 'foreign',
     ),
   ),
 );

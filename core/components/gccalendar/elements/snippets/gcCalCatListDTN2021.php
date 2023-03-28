@@ -12,6 +12,8 @@ $gcCal = $modx->getService(
 );
 $output = null;
 
+if (!($gcCal instanceof GcCalendar)) return '';
+
 $calid = $modx->getOption('calid', $scriptProperties, null);
 $cals = ($calid != null) ? explode(',', $calid) : array();
 if (!empty($cals)) {

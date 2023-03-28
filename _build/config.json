@@ -2,7 +2,7 @@
   "name": "gcCalendar",
   "lowCaseName": "gccalendar",
   "description": "A simple calendar plugin for MODX Revolution",
-  "version": "1.0.1-pl",
+  "version": "1.0.2-pl",
   "author": "matdave",
   "package": {
     "menus": [

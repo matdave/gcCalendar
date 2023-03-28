@@ -14,6 +14,8 @@ $gcCal = $modx->getService(
 );
 $output = '';
 
+if (!($gcCal instanceof GcCalendar)) return '';
+
 $now = strtotime('Today 12:01:00AM');
 $lastev = strtotime('+1 Year');
 

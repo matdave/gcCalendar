@@ -7,12 +7,12 @@ require_once MODX_CONNECTORS_PATH . 'index.php';
 
 $corePath = $modx->getOption('gccalendar.core_path', null, $modx->getOption('core_path') . 'components/gccalendar/');
 require_once $corePath . 'model/gccalendar/gccalendar.class.php';
-$modx->gcCalendar = new GcCalendar($modx);
+$modx->gcc = new GcCalendar($modx);
 
 $modx->lexicon->load('gccalendar:default');
 
 /* handle request */
-$path = $modx->getOption('processorsPath', $modx->gcCalendar->config, $corePath . 'processors/');
+$path = $modx->getOption('processorsPath', $modx->gcc->config, $corePath . 'processors/');
 $modx->request->handleRequest(array(
     'processors_path' => $path,
     'location' => '',

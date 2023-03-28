@@ -14,6 +14,8 @@ $gcCal = $modx->getService(
     $scriptProperties
 );
 $output = '';
+
+if (!($gcCal instanceof GcCalendar)) return '';
 $theme = $modx->getOption('theme', $scriptProperties, 'default');
 $modx->regClientCSS($gcCal->config['assetsUrl'] . 'themes/' . $theme . '/css/mxcalendar.css');
 $modx->regClientStartupScript($gcCal->config['assetsUrl'] . 'js/web/gc-calendar.js?v=20130114');

@@ -11,6 +11,8 @@ $gcCal = $modx->getService(
     $scriptProperties
 );
 
+if (!($gcCal instanceof GcCalendar)) return '';
+
 /* Get ID*/
 $evid = (isset($_GET['id']) && is_numeric($_GET['id'])) ? $_GET['id'] : null;
 if ($evid != null) {

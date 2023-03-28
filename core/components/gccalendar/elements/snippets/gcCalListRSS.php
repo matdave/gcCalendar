@@ -14,6 +14,8 @@ $gcCal = $modx->getService(
 );
 $output = '';
 
+if (!($gcCal instanceof GcCalendar)) return '';
+
 $now = strtotime('Today 12:01:00AM');
 $lastev = strtotime('+1 week');
 
@@ -144,7 +146,7 @@ if (!empty($calsArr)) {
                 $eventDet['title'] = $event->get('title');
                 $eventDet['locationname'] = $event->get('locationname');
                 $eventDet['locationaddr'] = $event->get('locationaddr');
-                $eventDet['pubDate'] = date("a, d b Y H:M:S z", strtotime("-1 week", $dArr->get('start')));
+                $eventDet['pubDate'] = date("D, d M o H:i:s O", strtotime("-1 week", $dArr->get('start')));
                 $eventDet['infoURL'] =  $modx->makeUrl(
                     (!empty($ajaxResourceId) ? $ajaxResourceId : $did),
                     '',

@@ -1,9 +1,16 @@
 <?php
+/**
+ * @package gccalendar
+ */
 $xpdo_meta_map['GcCalendarCats']= array (
-  'package' => 'gcCalendar',
+  'package' => 'gccalendar',
   'version' => '1.1',
   'table' => 'gc_calendar_cats',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'ctitle' => NULL,

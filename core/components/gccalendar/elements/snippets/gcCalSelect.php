@@ -13,6 +13,8 @@ $gcCal = $modx->getService(
     $scriptProperties
 );
 $output = '';
+
+if (!($gcCal instanceof GcCalendar)) return '';
 //limit conext key
 $did = $modx->resource->get('id');
 $document = $modx->getObject('modResource', $did);

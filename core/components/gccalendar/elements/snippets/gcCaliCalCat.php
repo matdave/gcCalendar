@@ -10,6 +10,8 @@ $gcCal = $modx->getService(
     $scriptProperties
 );
 $output = null;
+
+if (!($gcCal instanceof GcCalendar)) return '';
 /**
  * Created by JetBrains PhpStorm.
  * User: video2
