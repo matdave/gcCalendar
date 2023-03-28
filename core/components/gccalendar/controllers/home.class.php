@@ -1,4 +1,6 @@
 <?php
+// get the index.class.php file
+require_once dirname(__FILE__, 2) . '/index.class.php';
 class GcCalendarHomeManagerController extends GcCalendarManagerController
 {
     public function process(array $scriptProperties = array())
@@ -45,7 +47,9 @@ class GcCalendarHomeManagerController extends GcCalendarManagerController
         $this->addJavascript($this->gcc->config['jsUrl'].'mgr/utils/CheckColumn.js');
         $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/cust/window.dates.js');
         $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/cust/grid.dates.js');
-        $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/gccalendar.grid.js?v=20150109');
+        $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/gccalendar.window.create.js');
+        $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/gccalendar.window.update.js');
+        $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/gccalendar.grid.js');
         $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/gccalendar.calendars.js');
         $this->addJavascript($this->gcc->config['jsUrl'].'mgr/widgets/gccalendar.categories.js');
         if ($this->modx->user->isMember('Administrator')) {

@@ -4,7 +4,97 @@
   "description": "A simple calendar plugin for MODX Revolution",
   "version": "1.0.0-pl",
   "author": "matdave",
-  "package": {},
+  "package": {
+    "menus": [
+      {
+        "text": "gccalendar.menu",
+        "description": "gccalendar.menu_desc",
+        "action": "home"
+      }
+    ],
+    "elements" : {
+      "chunks" : [
+        {
+          "name": "gcCalday",
+          "file": "gcCalday.chunk.tpl"
+        },
+        {
+          "name": "gcCaldetail",
+          "file": "gcCaldetail.chunk.tpl"
+        },
+        {
+          "name": "gcCalheading",
+          "file": "gcCalheading.chunk.tpl"
+        },
+        {
+          "name": "gcCalItem",
+          "file": "gcCalItem.chunk.tpl"
+        },
+        {
+          "name": "gcCalItem2020",
+          "file": "gcCalItem2020.chunk.tpl"
+        },
+        {
+          "name": "gcCalItemDTN2021",
+          "file": "gcCalItemDTN2021.chunk.tpl"
+        },
+        {
+          "name": "gcCalItemRSS",
+          "file": "gcCalItemRSS.chunk.tpl"
+        },
+        {
+          "name": "gcCalList",
+          "file": "gcCalList.chunk.tpl"
+        },
+        {
+          "name": "gcCalList2020",
+          "file": "gcCalList2020.chunk.tpl"
+        },
+        {
+          "name": "gcCalListRSS",
+          "file": "gcCalListRSS.chunk.tpl"
+        },
+        {
+          "name": "gcCalmonth",
+          "file": "gcCalmonth.chunk.tpl"
+        },
+        {
+          "name": "gcCalweek",
+          "file": "gcCalweek.chunk.tpl"
+        }
+      ],
+      "snippets": [
+        {
+          "name": "gcCalListRSS",
+          "file": "gcCalListRSS.php"
+        },
+        {
+          "name": "gcCal",
+          "file": "gcCal.php"
+        },
+        {
+          "name": "gcCalCatList",
+          "file": "gcCalCatList.php"
+        },
+        {
+          "name": "gcCaliCalCat",
+          "file": "gcCaliCalCat.php"
+        },
+        {
+          "name": "gcCalList",
+          "file": "gcCalList.php"
+        },
+        {
+          "name": "gcCalList2020",
+          "file": "gcCalList2020.php"
+        },
+        {
+          "name": "gcCalListDTN2021",
+          "file": "gcCalListDTN2021.php"
+        }
+      ]
+    }
+  },
   "database": {
     "tables": [
       "GcCalendarCals",

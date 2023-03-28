@@ -29,7 +29,7 @@ $evid = (isset($_GET['id']) && is_numeric($_GET['id'])) ? $_GET['id'] : null;
 if ($evid != null) {
     /* PROCESS */
     $dates = $modx->newQuery('GcCalendarDates');
-// $dates->limit($limit,$offset);
+    // $dates->limit($limit,$offset);
     $dates->where(array('evid:=' => $evid));
     $dates->sortby('start', 'ASC');
     $dateArr = $modx->getIterator('GcCalendarDates', $dates);
@@ -54,7 +54,6 @@ if ($evid != null) {
         $output .= 'END:VEVENT' . PHP_EOL;
     }
     $output .= 'END:VCALENDAR';
-
 } else {
     echo "Please Enter a Valid ID";
 }

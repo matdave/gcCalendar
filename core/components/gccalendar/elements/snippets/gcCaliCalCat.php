@@ -195,15 +195,12 @@ if (!empty($cals)) {
             $output .= 'SUMMARY:' . escapeString($events[$evid]['title']) . "\r\n";
             $output .= 'DTSTART;TZID=America/Chicago:' . dateToCal($d['start']) . "\r\n";
             $output .= 'END:VEVENT' . "\r\n";
-
         }
         $output .= 'END:VCALENDAR';
-
     } else {
         $output .= 'No Events Found!';
     }
     /* PROCESS */
-
 } else {
     $output .= 'Please enter a valid category ID!';
 }

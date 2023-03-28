@@ -21,14 +21,15 @@ function getEventCalendarDateRange($activeMonthOnlyEvents = false)
 //**  STARTING DATA **//
 
 //Call the Service
+$corePath = $modx->getOption(
+    'gccalendar.core_path',
+    null,
+    $modx->getOption('core_path') . 'components/gcCalendar/'
+);
 $gcCal = $modx->getService(
     'gccalendar',
     'GcCalendar',
-    $modx->getOption(
-        'gccalendar.core_path',
-        null,
-        $modx->getOption('core_path') . 'components/gcCalendar/'
-    ) . 'model/gcCalendar/',
+    $corePath . 'model/gcCalendar/',
     $scriptProperties
 );
 $output = '';
@@ -362,16 +363,16 @@ if ($detail != null && $r != null) {
             $_GET['cid'] == $cid;
             $_GET['fc'] = 1;
             $xtrainfo = ($bcat != null) ? '&cid=' . $bcat : '';
-            include($modx->getOption('base_path') . '/assets/components/gcCalendar/snippets/gcCalList.php');
+            include($corePath . 'elements/snippets/gcCalList.php');
             break;
 
         case 'ical':
-            include($modx->getOption('base_path') . '/assets/components/gcCalendar/snippets/gcCaliCal.php');
+            include($corePath . 'elements/snippets/gcCaliCal.php');
             break;
 
         case 'select':
             $_GET['cid'] == $cid;
-            include($modx->getOption('base_path') . '/assets/components/gcCalendar/snippets/gcCalSelect.php');
+            include($corePath . 'elements/snippets/gcCalSelect.php');
             break;
     }
 }

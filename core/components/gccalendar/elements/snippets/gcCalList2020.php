@@ -57,14 +57,14 @@ $ajaxResourceId = $modx->getOption('ajaxResourceId', $scriptProperties, null);
 
 //limit set in snippet call create offset
 $limit = $modx->getOption('limit', $scriptProperties, 999);
-$datelimit = $modx->getOption('datelimit', $scriptProperties, NULL);
+$datelimit = $modx->getOption('datelimit', $scriptProperties, null);
 if ($datelimit != null) {
     $hqueryOptions[] = array('end:<' => strtotime($datelimit));
 }
 $offset = ($requested_page - 1) * $limit;
 
 //get category
-$subid = (isset($_GET['cid'])) ? htmlspecialchars($_GET['cid']) : NULL;
+$subid = (isset($_GET['cid'])) ? htmlspecialchars($_GET['cid']) : null;
 
 
 //** PROCESSING *//
@@ -86,7 +86,7 @@ if (!empty($calsArr)) {
     foreach ($calsArr as $cArr) {
         $calid[] = ($cal == null) ? $cArr->get('id') : $cArr;
     }
-//getEventId's in this Context
+    //getEventId's in this Context
 
     $calevs = $modx->newQuery('GcCalendarCalsConnect');
     $calevs->select(array('evid'));
@@ -113,7 +113,6 @@ if (!empty($calsArr)) {
                 }
                 $hqueryOptions[] = array('AND:evid:IN' => $ccevid);
             }
-
         }
 
         $dates = $modx->newQuery('GcCalendarDates');
@@ -155,12 +154,9 @@ if (!empty($calsArr)) {
         } else {
             $output .= 'No upcoming events!';
         }
-
     } else {
         $output .= 'No items in this Calendar!';
     }
-
-
 } else {
     $output .= 'No Calendars assigned to this site!';
 }

@@ -62,11 +62,19 @@
         <field key="repeatfrequency" dbtype="int" precision="2" phptype="int" null="true"/>
         <field key="repeatenddate" dbtype="int" precision="20" phptype="int" null="true"/>
         <field key="repeatdates" dbtype="text" phptype="string" null="true" />
-        <composite alias="dates" class="GcCalendarDates" local="id" foreign="evid" cardinality="many" owner="local" />
+
+		<field key="createdby" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
+		<field key="editedby" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
+		<field key="editedon" dbtype="TIMESTAMP" phptype="string" null="false" default="CURRENT_TIMESTAMP" />
 
         <index alias="PRIMARY" name="PRIMARY" primary="true" unique="true">
             <column key="id" collation="A" null="false" />
         </index>
+
+		<aggregate alias="CreatedBy" class="modUser" local="createdby" foreign="id" cardinality="one" owner="foreign"/>
+		<aggregate alias="EditedBy" class="modUser" local="editedby" foreign="id" cardinality="one" owner="foreign"/>
+
+		<composite alias="dates" class="GcCalendarDates" local="id" foreign="evid" cardinality="many" owner="local" />
 	</object>
 
     <!-- gcCalendar Category Connector-->
