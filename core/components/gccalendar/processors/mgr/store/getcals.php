@@ -8,7 +8,7 @@ $ug->where(array(
     'name:IN' => $userWUG_arr,
     'AND:name:NOT LIKE' => 'Cloud%',
 ));
-$gc_groups = $modx->getIterator('modUserGroup', $ug);
+$gc_groups = $modx->getCollection('modUserGroup', $ug);
 if (is_array($gc_groups) && count($gc_groups)) {
     foreach ($gc_groups as $mxg) {
         $webContextAccess = $modx->newQuery('modAccessContext');
@@ -16,7 +16,7 @@ if (is_array($gc_groups) && count($gc_groups)) {
             'principal' => $mxg->get('id'),
             'AND:target:!=' => 'mgr',
         ));
-        $gc_cntx = $modx->getIterator('modAccessContext', $webContextAccess);
+        $gc_cntx = $modx->getCollection('modAccessContext', $webContextAccess);
 
         if (is_array($gc_cntx) && count($gc_cntx)) {
             foreach ($gc_cntx as $acl) {
