@@ -15,7 +15,9 @@ $gcCal = $modx->getService(
 );
 $output = '';
 
-if (!($gcCal instanceof GcCalendar)) return '';
+if (!($gcCal instanceof GcCalendar)) {
+    return '';
+}
 $theme = $modx->getOption('theme', $scriptProperties, 'default');
 $modx->regClientCSS($gcCal->config['assetsUrl'] . 'themes/' . $theme . '/css/mxcalendar.css');
 $modx->regClientStartupScript($gcCal->config['assetsUrl'] . 'js/web/gc-calendar.js?v=20130114');
@@ -39,8 +41,14 @@ $selector = ($bcat == null) ?
 
 if ($detail != null && $r != null) {
     $gcevent = $modx->getObject('GcCalendarEvents', $detail);
+    if (empty($gcevent)) {
+        return '';
+    }
     $gctime = $modx->getObject('GcCalendarDates', $r);
-    $gcevent->set('ical', $modx->makeUrl($ajaxResourceId, '', array('id' => $gcevent->get('id'), 'ics' => 1)));
+    if (empty($gctime)) {
+        return '';
+    }
+    $gcevent->set('ical', $modx->makeUrl($ajaxResourceId, '', array('item_id' => $gcevent->get('id'), 'ics' => 1)));
     $gcevent->set('start', $gctime->get('start'));
     $gcevent->set('end', $gctime->get('end'));
     $gcevent->set('notes', preg_replace(
@@ -67,7 +75,7 @@ if ($detail != null && $r != null) {
 
     $getICS = (isset($_GET['ics']) && is_numeric($_GET['ics'])) ? $_GET['ics'] : 0;
     $ical = $modx->getOption('ical', $scriptProperties, $getICS);
-    if ($ical == 1 && !isset($_GET['dt']) && isset($_GET['id'])) {
+    if ($ical == 1 && !isset($_GET['dt']) && isset($_GET['item_id'])) {
         $mode = 'ical';
     }
 

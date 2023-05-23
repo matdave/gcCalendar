@@ -1,20 +1,21 @@
 <?php
 
+$corePath = $modx->getOption(
+    'gccalendar.core_path',
+    null,
+    $modx->getOption('core_path') . 'components/gccalendar/'
+);
 $gcCal = $modx->getService(
     'gccalendar',
     'GcCalendar',
-    $modx->getOption(
-        'gccalendar.core_path',
-        null,
-        $modx->getOption('core_path') . 'components/gccalendar/'
-    ) . 'model/gccalendar/',
+    $corePath . 'model/gccalendar/',
     $scriptProperties
 );
 
 if (!($gcCal instanceof GcCalendar)) return '';
 
 /* Get ID*/
-$evid = (isset($_GET['id']) && is_numeric($_GET['id'])) ? $_GET['id'] : null;
+$evid = (isset($_GET['item_id']) && is_numeric($_GET['item_id'])) ? $_GET['item_id'] : null;
 if ($evid != null) {
     /* PROCESS */
     $dates = $modx->newQuery('GcCalendarDates');
@@ -43,6 +44,8 @@ if ($evid != null) {
         $output .= 'END:VEVENT' . PHP_EOL;
     }
     $output .= 'END:VCALENDAR';
+    echo $output;
+    die();
 } else {
     echo "Please Enter a Valid ID";
 }

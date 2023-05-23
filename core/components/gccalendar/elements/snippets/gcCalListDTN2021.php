@@ -135,7 +135,7 @@ if (!empty($calsArr)) {
                 $eventDet['id'] = $evid;
                 $eventDet['eo'] = $eo;
                 $eventDet['idx'] = $idx;
-                $eventDet['ical'] = $modx->makeUrl((!empty($ajaxResourceId) ? $ajaxResourceId : $did), '', array('id' => $evid, 'ics' => 1));
+                $eventDet['ical'] = $modx->makeUrl((!empty($ajaxResourceId) ? $ajaxResourceId : $did), '', array('item_id' => $evid, 'ics' => 1));
                 $eventDet['start'] = $dArr->get('start');
                 $eventDet['span'] = (date("m.d.y", $dArr->get('start')) == date("m.d.y", $dArr->get('end'))) ? date("m.d.y", $dArr->get('start')) : date("m.d.y", $dArr->get('start')) . " - " . date("m.d.y", $dArr->get('end'));
                 $eventDet['end'] = $dArr->get('end');

@@ -132,7 +132,7 @@ if (!empty($calsArr)) {
                 $eventDet['ical'] = $modx->makeUrl(
                     (!empty($ajaxResourceId) ? $ajaxResourceId : $did),
                     '',
-                    array('id' => $evid, 'ics'=>1),
+                    array('item_id' => $evid, 'ics'=>1),
                     'full'
                 );
                 $eventDet['start'] = $dArr->get('start');
