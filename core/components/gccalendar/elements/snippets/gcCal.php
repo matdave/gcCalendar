@@ -20,14 +20,21 @@ if (!($gcCal instanceof GcCalendar)) {
 }
 $theme = $modx->getOption('theme', $scriptProperties, 'default');
 $modx->regClientCSS($gcCal->config['assetsUrl'] . 'themes/' . $theme . '/css/mxcalendar.css');
-$modx->regClientStartupScript($gcCal->config['assetsUrl'] . 'js/web/gc-calendar.js?v=20130114');
+$modx->regClientStartupScript($gcCal->config['assetsUrl'] . 'js/web/gc-calendar.js?v=20230114');
 
 //limit conext key
 $did = $modx->resource->get('id');
 $document = $modx->getObject('modResource', $did);
 $key = $document->get('context_key');
 $bcat = $modx->getOption('cat', $scriptProperties, null);
-$cid = (isset($_GET['cid']) && is_numeric($_GET['cid'])) ? $_GET['cid'] : $bcat;
+$cid = (isset($_GET['cid'])) ? $_GET['cid'] : $bcat;
+$cid = explode(",", $cid);
+// make sure they are all numeric
+foreach ($cid as $key => $value) {
+    if (!is_numeric($value)) {
+        unset($cid[$key]);
+    }
+}
 $bcal = $modx->getOption('cal', $scriptProperties, null);
 $cal = (isset($_GET['cal']) && is_numeric($_GET['cal'])) ? $_GET['cal'] : $bcal;
 
@@ -35,10 +42,19 @@ $ajaxResourceId = $modx->getOption('ajaxResourceId', $scriptProperties, null);
 $detail = (isset($_GET['detail']) && is_numeric($_GET['detail'])) ? $_GET['detail'] : null;
 $r = (isset($_GET['r']) && is_numeric($_GET['r'])) ? $_GET['r'] : null;
 $detailTpl = $modx->getOption('detailTpl', $scriptProperties, 'gcCaldetail');
-$selector = ($bcat == null) ?
-    '<select aria-label="Select Category" id="calselect" style="display:none;" data-gcc="/[[~' . $ajaxResourceId . ']]" data-loc="/[[~' . $did . ']]"></select>' :
-    '<div style="display:none; visibility:hidden;"><select id="calselect" style="display:none;" data-gcc="/[[~' . $ajaxResourceId . ']]" data-loc="/[[~' . $did . ']]"><option select="selected" value="' . $bcat . '"></select></div>';
 
+$selectorAdditional = [];
+if (isset($_GET['calendar'])) {
+    $selectorAdditional['calendar'] = $_GET['calendar'];
+}
+if (isset($_GET['list'])) {
+    $selectorAdditional['list'] = $_GET['list'];
+}
+
+$selector = ($bcat == null) ?
+    '<select aria-label="Select Category" id="calselect" style="display:none; height:auto !important;" data-gcc="/[[~' . $ajaxResourceId . ']]" data-loc="/[[~' . $did . ']]" multiple></select>' :
+    '<div style="display:none; visibility:hidden;"><select id="calselect" style="display:none; height:auto !important;" data-gcc="/[[~' . $ajaxResourceId . ']]" data-loc="/[[~' . $did . ']]" multiple><option select="selected" value="' . $bcat . '"></select></div>';
+$selector .= '<small>Hold Ctrl or Shift to select multiple categories</small>';
 if ($detail != null && $r != null) {
     $gcevent = $modx->getObject('GcCalendarEvents', $detail);
     if (empty($gcevent)) {
@@ -56,6 +72,7 @@ if ($detail != null && $r != null) {
         "$1",
         $gcevent->get('notes')
     ));
+    $gcevent->set('r', $r);
     $eDetails = $gcevent->toArray();
     $output .= $modx->getChunk($detailTpl, $eDetails);
 } else {
@@ -68,9 +85,15 @@ if ($detail != null && $r != null) {
     $headingTpl = $modx->getOption('headingTpl', $scriptProperties, 'gcCalheading');
 
     $getList = (isset($_GET['list']) && is_numeric($_GET['list'])) ? $_GET['list'] : 0;
-    $list = $modx->getOption('list', $scriptProperties, $getList);
+    $list = (int) $modx->getOption('list', $scriptProperties, $getList);
     if ($list == 1 && !isset($_GET['dt'])) {
         $mode = 'list';
+    }
+
+    $getCalendar = (isset($_GET['calendar']) && is_numeric($_GET['calendar'])) ? $_GET['calendar'] : 0;
+    $calendar = (int) $modx->getOption('calendar', $scriptProperties, $getCalendar);
+    if ($calendar == 1 && !isset($_GET['dt'])) {
+        $mode = 'calendar';
     }
 
     $getICS = (isset($_GET['ics']) && is_numeric($_GET['ics'])) ? $_GET['ics'] : 0;
@@ -84,7 +107,7 @@ if ($detail != null && $r != null) {
     if ($select == 1) {
         $mode = 'select';
     }
-    if (!isset($_GET['list']) && !isset($_GET['select']) && !isset($_GET['dt']) && !isset($_GET['ics'])) {
+    if (!isset($_GET['select']) && !isset($_GET['dt']) && !isset($_GET['ics'])) {
         echo $selector;
     }
 
@@ -124,6 +147,7 @@ if ($detail != null && $r != null) {
     $globalParams = array('calf' => $calFilter);
     $todayLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $gcCal->strFormatTime('%Y-%m'))));
     $listLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('list' => 1, 'fc' => 1)));
+    $calendarLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('calendar' => 1, 'fc' => 1)));
     $prevLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $prevMonth)));
     $nextLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $nextMonth)));
 
@@ -165,7 +189,7 @@ if ($detail != null && $r != null) {
                         //$cqueryOptions[] = array('catsid'=>$cid);
                         $cats = $modx->newQuery('GcCalendarCatsConnect');
                         $cats->select('evid');
-                        $cats->where(array('catsid' => $cid));
+                        $cats->where(array('catsid:IN' => $cid));
                         $cats->distinct();
                         $catsItt = $modx->getIterator('GcCalendarCatsConnect', $cats);
                         if (!empty($catsItt)) {
@@ -362,6 +386,8 @@ if ($detail != null && $r != null) {
                     , 'listLink' => $listLink
                     , 'prevLink' => $prevLink
                     , 'nextLink' => $nextLink
+                    , 'cid' => $cid
+                    , 'cal' => $cal
                 );
                 //return $chunkMonth->process($phMonth);
                 $output .= $modx->getChunk($monthTpl, $phMonth);

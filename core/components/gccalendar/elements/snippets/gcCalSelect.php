@@ -21,7 +21,14 @@ $document = $modx->getObject('modResource', $did);
 $key = $document->get('context_key');
 
 $bcat = $modx->getOption('cat', $scriptProperties, null);
-$cid = (isset($_GET['cid']) && is_numeric($_GET['cid'])) ? $_GET['cid'] : $bcat;
+$cid = (isset($_GET['cid'])) ? $_GET['cid'] : $bcat;
+$cid = explode(",", $cid);
+// make sure they are all numeric
+foreach ($cid as $key => $value) {
+    if (!is_numeric($value)) {
+        unset($cid[$key]);
+    }
+}
 $bcal = $modx->getOption('cal', $scriptProperties, null);
 $cal = (isset($_GET['cal']) && is_numeric($_GET['cal'])) ? $_GET['cal'] : $bcal;
 
@@ -85,7 +92,7 @@ if (!empty($calsArr)) {
         $catTitle = '';
         foreach ($catOptArr as $cOArr) {
             $selected = '';
-            if ($cid == $cOArr['id']) {
+            if (in_array($cOArr['id'], $cid)) {
                 $selected = ' selected="selected"';
                 $catTitle = $cOArr['title'];
             }
@@ -94,7 +101,7 @@ if (!empty($calsArr)) {
                 $selectGroup .= '<option value="' . $cOArr['id'] . '" ' . $selected . '>All Departments</option>';
                 foreach ($cOArr['sub'] as $cOS) {
                     $selected = '';
-                    if ($cid == $cOS['id'] && $bcat != $cOArr['id']) {
+                    if (in_array($cid == $cOS['id'], $cid) && $bcat != $cOArr['id']) {
                         $selected = ' selected="selected"';
                         $catTitle = $cOS['title'];
                     }

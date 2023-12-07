@@ -1,5 +1,5 @@
 <div id="calbody" style="">
-    <div class="controls"><a href="[[+listLink]]" rel="nofollow" class="mxcnav sm btn" id="mxclistlnk"><i class="icon-list" style="font-style:normal;"></i></a><span class="mxcnav sm btn select"><i class="icon-th" style="font-style:normal;"></i></span></div>
+    <div class="controls"><a href="[[~[[*id]]]]?list=1" rel="nofollow" class="mxcnav sm btn" id="mxclistlnk"><i class="icon-list" style="font-style:normal;"></i></a><span class="mxcnav sm btn select"><i class="icon-th" style="font-style:normal;"></i></span></div>
     <a href="[[+todayLink]]" rel="nofollow" class="mxcnav sm" id="mxctodaylnk">[[+todayLabel]]</a>
 
     <span class="nomargins">

@@ -24,7 +24,17 @@ $did = $modx->resource->get('id');
 $document = $modx->getObject('modResource', $did);
 $key = $document->get('context_key');
 $bcat = $modx->getOption('cat', $scriptProperties, null);
-$cid = (isset($_GET['cid']) && is_numeric($_GET['cid'])) ? $_GET['cid'] : $bcat;
+$cid = (isset($_GET['cid'])) ? $_GET['cid'] : $bcat;
+if (is_array($cid)) {
+    $cid = implode(",", $cid);
+}
+$cid = explode(",", $cid);
+// make sure they are all numeric
+foreach ($cid as $key => $value) {
+    if (!is_numeric($value)) {
+        unset($cid[$key]);
+    }
+}
 $bcal = $modx->getOption('cal', $scriptProperties, null);
 $cal = (isset($_GET['cal']) && is_numeric($_GET['cal'])) ? $_GET['cal'] : $bcal;
 
@@ -54,7 +64,8 @@ $itemTpl = $modx->getOption('itemTpl', $scriptProperties, 'gcCalItem');
 
 
 //** SCRIPT OPTIONS **//
-
+$calFilter = $_GET['calf'] ?? $modx->getOption('calendarFilter', $scriptProperties, null); //-- Defaults to show all calendars
+$globalParams = array('calf' => $calFilter);
 $ajaxResourceId = $modx->getOption('ajaxResourceId', $scriptProperties, null);
 
 //limit set in snippet call create offset
@@ -105,7 +116,7 @@ if (!empty($calsArr)) {
             //$cqueryOptions[] = array('catsid'=>$cid);
             $cats = $modx->newQuery('GcCalendarCatsConnect');
             $cats->select('evid');
-            $cats->where(array('catsid' => $cid));
+            $cats->where(array('catsid:IN' => $cid));
             $cats->distinct();
             $catsItt = $modx->getIterator('GcCalendarCatsConnect', $cats);
             if (!empty($catsItt)) {
@@ -151,7 +162,12 @@ if (!empty($calsArr)) {
                 $eo = ($eo == 0) ? 1 : 0;
                 $idx++;
             }
-            $eventsArr = array('events' => $evitems);
+            $calendarLink = $modx->makeUrl((!empty($ajaxResourceId) ? $ajaxResourceId : $did), '', array_merge($globalParams, array('calendar' => 1, 'fc' => 1)));
+            $eventsArr = array('events' => $evitems,
+                'calLink' => $calendarLink,
+                'cid' => $cid,
+                'cal' => $cal,
+                );
             $output .= $modx->getChunk($listTpl, $eventsArr);
         } else {
             $output .= 'No upcoming events!';

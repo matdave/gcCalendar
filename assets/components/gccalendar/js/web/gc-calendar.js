@@ -234,7 +234,21 @@ $(document).ready(function () {
             },
         });
         gcc.change(function () {
-            window.location.href = gcc.attr('data-loc') + '?cid=' + gcc.val();
+            // check if calendar or list are set in the get params
+            var url = window.location.href;
+            // get just the query string
+            url = url.split('?')[1];
+            var add = '';
+            if (url == undefined) {
+                url = '';
+            }
+            if (url.indexOf('calendar') > -1) {
+                add = '&calendar=1';
+            }
+            if (url.indexOf('list') > -1) {
+                add = '&list=1';
+            }
+            window.location.href = gcc.attr('data-loc') + '?cid=' + gcc.val() + add;
         });
     }
 });
