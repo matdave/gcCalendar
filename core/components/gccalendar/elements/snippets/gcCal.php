@@ -16,25 +16,29 @@ $gcCal = $modx->getService(
 $output = '';
 
 if (!($gcCal instanceof GcCalendar)) {
+    $modx->log(1, "FAIL!");
     return '';
 }
+
 $theme = $modx->getOption('theme', $scriptProperties, 'default');
 $modx->regClientCSS($gcCal->config['assetsUrl'] . 'themes/' . $theme . '/css/mxcalendar.css');
-$modx->regClientStartupScript($gcCal->config['assetsUrl'] . 'js/web/gc-calendar.js?v=20230114');
+$modx->regClientStartupScript($gcCal->config['assetsUrl'] . 'js/web/gc-calendar.js?v=20240105');
 
-//limit conext key
+// get document information
 $did = $modx->resource->get('id');
 $document = $modx->getObject('modResource', $did);
 $key = $document->get('context_key');
 $bcat = $modx->getOption('cat', $scriptProperties, null);
 $cid = (isset($_GET['cid'])) ? $_GET['cid'] : $bcat;
 $cid = explode(",", $cid);
+
 // make sure they are all numeric
 foreach ($cid as $key => $value) {
     if (!is_numeric($value)) {
         unset($cid[$key]);
     }
 }
+
 $bcal = $modx->getOption('cal', $scriptProperties, null);
 $cal = (isset($_GET['cal']) && is_numeric($_GET['cal'])) ? $_GET['cal'] : $bcal;
 
@@ -54,7 +58,7 @@ if (isset($_GET['list'])) {
 $selector = ($bcat == null) ?
     '<select aria-label="Select Category" id="calselect" style="display:none; height:auto !important;" data-gcc="/[[~' . $ajaxResourceId . ']]" data-loc="/[[~' . $did . ']]" multiple></select>' :
     '<div style="display:none; visibility:hidden;"><select id="calselect" style="display:none; height:auto !important;" data-gcc="/[[~' . $ajaxResourceId . ']]" data-loc="/[[~' . $did . ']]" multiple><option select="selected" value="' . $bcat . '"></select></div>';
-$selector .= '<small>Hold Ctrl or Shift to select multiple categories</small>';
+$selector .= ($_GET['fc'] == 1) ? null : '<small>Hold Ctrl or Shift to select multiple categories.</small>' ;
 if ($detail != null && $r != null) {
     $gcevent = $modx->getObject('GcCalendarEvents', $detail);
     if (empty($gcevent)) {
@@ -78,7 +82,7 @@ if ($detail != null && $r != null) {
 } else {
     //** Initial Time TPLS & Functions **//
     $mode = 'calendar';
-
+    $modx->log(1, "Executing the calendar");
     $dayTpl = $modx->getOption('dayTpl', $scriptProperties, 'gcCalday');
     $weekTpl = $modx->getOption('weekTpl', $scriptProperties, 'gcCalweek');
     $monthTpl = $modx->getOption('monthTpl', $scriptProperties, 'gcCalmonth');
@@ -145,16 +149,19 @@ if ($detail != null && $r != null) {
 
     $headingLabel = strtotime($mStartDate);
     $globalParams = array('calf' => $calFilter);
-    $todayLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $gcCal->strFormatTime('%Y-%m'))));
-    $listLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('list' => 1, 'fc' => 1)));
-    $calendarLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('calendar' => 1, 'fc' => 1)));
-    $prevLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $prevMonth)));
-    $nextLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $nextMonth)));
+    $todayLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $gcCal->strFormatTime('%Y-%m'), 'cid' => implode(',', $cid))));
+    $listLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('list' => 1, 'fc' => 1, 'cid' => implode(',', $cid))));
+    $calendarLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('calendar' => 1, 'fc' => 1, 'cid' => implode(',', $cid))));
+    $prevLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $prevMonth, 'cid' => implode(',', $cid))));
+    $nextLink = $modx->makeUrl($ajaxResourceId, '', array_merge($globalParams, array('dt' => $nextMonth, 'cid' => implode(',', $cid))));
 
     $days = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
     $dayNum = array(7, 1, 2, 3, 4, 5, 6);
     $heading = '';
 
+
+    $modx->log(1, "Mode: $mode");
+    $modx->log(1, "Executing from ID: $did");
     switch ($mode) {
         case 'calendar':
             if ($cal == null) {
@@ -165,6 +172,7 @@ if ($detail != null && $r != null) {
             } else {
                 $calsArr = explode(",", $cal);
             }
+            $modx->log(1, "LIST OF CALENDARS: $calsArr");
             $arrEventDates = array();
             if (!empty($calsArr)) {
                 $calid = array();
@@ -262,7 +270,7 @@ if ($detail != null && $r != null) {
                 , 'weekClass' => ''
                 , 'days' => $heading
                 );
-                $weeks = '';
+                $weeks = $modx->getChunk($weekTpl, $phHeading);
                 //-- Start the Date loop
                 $var = 0;
                 foreach ($arrEventDates as $e) {
@@ -278,7 +286,7 @@ if ($detail != null && $r != null) {
 
                         $oDetails['detailURL'] = $modx->makeUrl(
                             (
-                                !empty($ajaxResourceId) && (bool)$modalView === true ?
+                            !empty($ajaxResourceId) && (bool)$modalView === true ?
                                 $ajaxResourceId :
                                 $did
                             ),
@@ -325,11 +333,11 @@ if ($detail != null && $r != null) {
                                 $event_html = '<div id="' . $el['id'] .
                                     '" class="' . $el['eventClass'] .
                                     '">' . $el['start'] .
-                                    '<span class="title startdate "><a aria-label="' . $el['detailURL'] .
+                                    '<div class="title startdate "><a aria-label="' . $el['detailURL'] .
                                     ' ' . $el['title'] .
                                     '" href="/' . $el['detailURL'] .
                                     '" class="gccalevent" >' . $el['title'] .
-                                    '</a></span></div>';
+                                    '</a></div></div>';
                                 $eventList .= $event_html;
                             }
                         }
@@ -349,12 +357,12 @@ if ($detail != null && $r != null) {
                                 $dayMonthDay));
                         $phDay = array(
                             'dayOfMonth' => $dayMonthDay
-                            , 'dayOfMonthID' => 'dom-' . $gcCal->strFormatTime('%b%A%d', $iDay)
-                            , 'events' => $eventList
-                            , 'fulldate' => $gcCal->strFormatTime('%m/%d/%Y', $iDay)
-                            , 'tomorrow' => $gcCal->strFormatTime('%m/%d/%Y', strtotime('+1 day', $iDay))
-                            , 'yesterday' => $gcCal->strFormatTime('%m/%d/%Y', strtotime('-1 day', $iDay))
-                            , 'class' => $isToday . ($mCurMonth == $thisMonth ? '' : ' ncm')
+                        , 'dayOfMonthID' => 'dom-' . $gcCal->strFormatTime('%b%A%d', $iDay)
+                        , 'events' => $eventList
+                        , 'fulldate' => $gcCal->strFormatTime('%m/%d/%Y', $iDay)
+                        , 'tomorrow' => $gcCal->strFormatTime('%m/%d/%Y', strtotime('+1 day', $iDay))
+                        , 'yesterday' => $gcCal->strFormatTime('%m/%d/%Y', strtotime('-1 day', $iDay))
+                        , 'class' => $isToday . ($mCurMonth == $thisMonth ? '' : ' ncm')
                         );
                         $days .= $modx->getChunk($dayTpl, $phDay);
                     } while (++$diw < 7);
@@ -366,7 +374,6 @@ if ($detail != null && $r != null) {
                     , 'weekClass' => $gcCal->strFormatTime('%A%d', $iDay)
                     , 'days' => $days
                     );
-                    //$weeks.=$chunkWeek->process($phWeek);
                     $weeks .= $modx->getChunk($weekTpl, $phWeek);
                 } while (++$var < 6); //Only advance 5 weeks giving total of 6 weeks
 
@@ -378,16 +385,16 @@ if ($detail != null && $r != null) {
                 //-- Set additional day placeholders for month
                 $phMonth = array(
                     'containerID' => $gcCal->strFormatTime('%a', $iDay)
-                    , 'containerClass' => $gcCal->strFormatTime('%a%Y', $iDay)
-                    , 'weeks' => $heading . $weeks
-                    , 'headingLabel' => $headingLabel
-                    , 'todayLink' => $todayLink
-                    , 'todayLabel' => 'Today'
-                    , 'listLink' => $listLink
-                    , 'prevLink' => $prevLink
-                    , 'nextLink' => $nextLink
-                    , 'cid' => $cid
-                    , 'cal' => $cal
+                , 'containerClass' => $gcCal->strFormatTime('%a%Y', $iDay)
+                , 'weeks' => $weeks
+                , 'headingLabel' => $headingLabel
+                , 'todayLink' => $todayLink
+                , 'todayLabel' => 'Today'
+                , 'listLink' => $listLink
+                , 'prevLink' => $prevLink
+                , 'nextLink' => $nextLink
+                , 'cid' => $cid
+                , 'cal' => $cal
                 );
                 //return $chunkMonth->process($phMonth);
                 $output .= $modx->getChunk($monthTpl, $phMonth);
@@ -411,4 +418,7 @@ if ($detail != null && $r != null) {
             break;
     }
 }
+
+$dateType = gettype($dates);
+
 echo $output;
